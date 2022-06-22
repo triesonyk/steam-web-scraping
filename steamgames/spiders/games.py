@@ -92,13 +92,15 @@ class GamesSpider(scrapy.Spider):
         developer = response.xpath('//div[@id="developers_list"]/a/text()').getall()
         publisher = response.xpath('//div[@class="glance_ctn_responsive_left"]/div[@class="dev_row"][2]/div/a/text()').getall()
         overall_reviews = response.xpath('(//div[@id="userReviews"]/div/div/span[contains(@class,"game_review_summary")])[1]/text()').get()
-        text_reviews = self.remove_characters(response.xpath('(//span[@class="nonresponsive_hidden responsive_reviewdesc"])[1]/text()').get())
+        text_reviews_recent = self.remove_characters(response.xpath('(//span[@class="nonresponsive_hidden responsive_reviewdesc"])[1]/text()').get())
+        text_reviews_overall = self.remove_characters(response.xpath('(//span[@class="nonresponsive_hidden responsive_reviewdesc"])[2]/text()').get())
         description = self.remove_characters(response.xpath('//div[@class="game_description_snippet"]/text()').get())
         tags = self.remove_characters_list(response.xpath('//div[@class="glance_tags popular_tags"]/a/text()').getall())
+        genre = self.remove_characters_list(response.xpath('//div[@id="genresAndManufacturer"]/span/a/text()').getall())
         processor = response.xpath('(//strong[contains(text(),"Processor")])[1]/following-sibling::node()[1]').get()
         ram = response.xpath('(//strong[contains(text(),"Memory")])[1]/following-sibling::node()[1]').get()
         graphic_card = response.xpath('(//strong[contains(text(),"Graphics")])[1]/following-sibling::node()[1]').get()
-        rating = response.xpath('//div[@class="game_rating_agency"]/text()').get()
+        rating = response.xpath('//a[@href="http://www.pegi.info/"]/img/@src').get()
         language = self.remove_characters_list(response.xpath('//td[@class="ellipsis"]/text()').getall())
         metacriticts = self.remove_characters(response.xpath('//div[@class="score high"]/text()').get())
         yield{
@@ -113,9 +115,11 @@ class GamesSpider(scrapy.Spider):
             'developer' : developer,
             'publisher' : publisher,
             'overall_reviews' : overall_reviews,
-            'text_reviews' : text_reviews,
+            'recent_reviews' : text_reviews_recent,
+            'whole_reviews' : text_reviews_overall,
             'description' : description,
             'tags' : tags,
+            'genre' : genre,
             'processor' : processor,
             'ram' : ram,
             'graphic_card' : graphic_card,
